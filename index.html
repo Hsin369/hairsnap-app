@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HairSnap 表單</title>
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #fff;
+      color: #111;
+      margin: 0;
+      padding: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+    h2 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fafafa;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      background-color: #111;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background-color: #333;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+    .status {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎀 HairSnap 髮型紀錄表單</h2>
+  <form id="hairsnap-form">
+    <div class="form-group">
+      <label>髮型名稱 *</label>
+      <input type="text" name="髮型名稱" required />
+    </div>
+    <div class="form-group">
+      <label>分類 *</label>
+      <input type="text" name="分類" required />
+    </div>
+    <div class="form-group">
+      <label>層次設計</label>
+      <input type="text" name="層次設計" />
+    </div>
+    <div class="form-group">
+      <label>使用情境</label>
+      <input type="text" name="使用情境" />
+    </div>
+    <div class="form-group">
+      <label>特點說明</label>
+      <textarea name="特點說明" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label>顏色 / 配件</label>
+      <input type="text" name="顏色 / 配件" />
+    </div>
+    <div class="form-group">
+      <label>狀態 *</label>
+      <input type="text" name="狀態" required />
+    </div>
+    <button type="submit">送出表單</button>
+    <div class="status" id="status"></div>
+  </form>
+
+  <script>
+    document.getElementById('hairsnap-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        if (key.includes(' / ')) {
+          key = key.replace(' / ', '／');
+        }
+        if (value.includes(',')) {
+          data[key] = value.split(',').map(v => v.trim());
+        } else {
+          data[key] = value.trim();
+        }
+      });
+
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = '資料送出中...';
+
+      try {
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbyxkHs8kCXkdWJIjfAZInYSKzf1SIDgbOAb7-HuPorshyTbNlKO_cCoZAV1LxUjh-I0/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }
+        );
+        statusDiv.textContent = '✅ 已成功送出！';
+        form.reset();
+      } catch (error) {
+        console.error(error);
+        statusDiv.textContent = '❌ 發生錯誤，請稍後再試。';
+      }
+    });
+  </script>
+</body>
+</html>
